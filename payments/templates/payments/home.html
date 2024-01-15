@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1 class="product">Products</h1>
+    <section>
+        {% if items|length < 1 %}
+        <br>
+        <h4>Список товаров пуст, пожалуйста добавьте товары в панели администратора</h4>
+        {% else %}
+            {% for item in items %}
+            <div class="row justify-content-center my-5">
+                <div class="card" style="width: 25rem;">
+                    <img src="{% static '/images/shopping.svg' %}" class="card-img-top " alt="product">
+                    <div class="card-body">
+                    <h5 class="card-title"><strong>Name:</strong> {{ item.name }}</h5>
+                    <p class="card-text"><strong>Description:</strong> {{ item.description|truncatechars:100 }}</p>
+                    <p class="card-text"><strong>Price:</strong> {{ item.convert_to_usd }}$</p>
+                    <a href="{% url 'item' item.pk %}" class="btn btn-primary" type="button">Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

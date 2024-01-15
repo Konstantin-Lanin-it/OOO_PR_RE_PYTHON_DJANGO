@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Item{% endblock %} 
+{% block content %}
+<div class="container">
+    <h1 class="product">Details</h1>
+    <section>
+        <div class="row justify-content-center my-5">
+            <div class="card" style="width: 30rem;">
+                <img src="{% static '/images/shopping.svg' %}" class="card-img-top " alt="product">
+                <div class="card-body">
+                <h5 class="card-title"><strong>Name:</strong> {{ item.name }}</h5>
+                <p class="card-text"><strong>Description:</strong> {{ item.description}}</p>
+                <p class="card-text"><strong>Price:</strong> {{ item.convert_to_usd }}$</p>
+                <button type="button" class="btn btn-primary" id="buy-btn">Buy</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% csrf_token %}
+
+<script type="text/javascript">
+    const csrftoken = document.querySelector(
+        "[name=csrfmiddlewaretoken]"
+    ).value;
+    let stripe = Stripe("{{ STRIPE_PUBLISHABLE_KEY }}");
+    let checkoutButton = document.getElementById("buy-btn");
+    checkoutButton.addEventListener("click", function () {
+        fetch("{% url 'session' item.id %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrftoken,
+            },
+        })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (session) {
+                return stripe.redirectToCheckout({
+                    sessionId: session.id,
+                });
+            })
+            .then(function (result) {
+                if (result.error) {
+                    alert(result.error.message);
+                }
+            })
+            .catch(function (error) {
+                console.error("Error:", error);
+            });
+    });
+</script>
+{% endblock %}
